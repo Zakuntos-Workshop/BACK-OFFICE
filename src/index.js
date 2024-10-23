@@ -26,6 +26,7 @@ import Cities from "layouts/Cities";
 import Features from "layouts/Features";
 import BankAccounts from "layouts/BankAccounts";
 import Currencies from "layouts/Currencies";
+import Permissions from "layouts/Permissions";
 
 const queryClient = new QueryClient(); 
 const root = createRoot(document.getElementById("root"));
@@ -45,6 +46,7 @@ root.render(
           <Route path="/admin/student/:id" element={<Students />} />
           <Route path="/admin/banks" element={<Banks />} />
           <Route path="/admin/roles" element={<Roles />} />
+          <Route path="/admin/permissions/:id" element={<Permissions />} />
           <Route path="/admin/fees" element={<Fees />} />
           <Route path="/admin/rates" element={<Rates />} />
           <Route path="/admin/cities" element={<Cities />} />

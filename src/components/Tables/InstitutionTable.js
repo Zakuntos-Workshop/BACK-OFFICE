@@ -107,7 +107,7 @@ export default function InstitutionTable({ color }) {
                         alt={institution.name}
                         className="h-12 w-12 rounded-full border"
                       />
-                    </td>
+                    </td> 
                     <td className="global-cell">
                       <Link
                         to={`/institutions/${institution.id}`}

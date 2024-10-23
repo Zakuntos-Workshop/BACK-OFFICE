@@ -1,6 +1,6 @@
 import {Component} from 'react';
 import API from '../api/API';
-import TabActions from '../components/table/TabActions';
+import TabActions from 'components/Tables/TabActions';
 import {toast} from 'react-toastify'; 
 import 'react-toastify/dist/ReactToastify.css'; 
 import { NavLink } from 'react-router-dom';
@@ -166,18 +166,30 @@ class Helper extends Component{
         )
     }
     
+    // getUrlParams = (roots = 1) => {
+    //     const root = window.location.pathname;
+    //     let rootToArray = root.split('/');
+    //     let params = [];
+
+    //     for (let index = roots + 1; index < rootToArray.length; index++) {
+    //         const param = rootToArray[index];
+    //         params.push(param);
+    //     }
+
+    //     return params;
+    // }
+
     getUrlParams = (roots = 1) => {
         const root = window.location.pathname;
         let rootToArray = root.split('/');
-        let params = [];
-
-        for (let index = roots + 1; index < rootToArray.length; index++) {
-            const param = rootToArray[index];
-            params.push(param);
+    
+        if (roots + 1 < rootToArray.length) {
+            return rootToArray[roots + 1]; 
         }
-
-        return params;
+    
+        return null; 
     }
+    
 
 }
 
