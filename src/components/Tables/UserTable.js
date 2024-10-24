@@ -72,7 +72,7 @@ export default function UserTable({ color }) {
                 (color === "light" ? "text-blueGray-700" : "text-white")
               }
             >
-              Les Utilisateurs
+              Utilisateurs
             </h3>
             <div className="flex items-center">
               <form onSubmit={search} className="mr-4">
@@ -126,11 +126,6 @@ export default function UserTable({ color }) {
               <tbody>
                 {users?.map((user, index) => (
                   <tr key={index} className="global-row">
-                    <td className="global-cell"><img
-                        src={user.logo}
-                        alt={user.full_name}
-                        className="h-12 w-12 rounded-full border"
-                      /></td>
                     <td className="global-cell">{user.full_name}</td>
                     <td className="global-cell">{user.role.name}</td>
                     <td className="global-cell">{user.email}</td>

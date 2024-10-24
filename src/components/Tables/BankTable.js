@@ -92,7 +92,6 @@ export default function BankTable({ color }) {
           <table className="global-table">
             <thead>
               <tr>
-                <th className="global-header"></th>
                 <th className="global-header">Nom</th>
                 <th className="global-header">Catégorie</th>
                 <th className="global-header">Description</th>
@@ -103,11 +102,6 @@ export default function BankTable({ color }) {
             <tbody>
               {banks.map((bank) => (
                 <tr className="global-row" key={bank.id}>
-                  <td className="global-cell"><img
-                        src={bank.logo}
-                        alt={bank.name}
-                        className="h-12 w-12 rounded-full border"
-                      /></td>
                   <td className="global-cell">{bank.name}</td>
                   <td className="global-cell">{bank.category}</td>
                   <td className="global-cell">{bank.description}</td>

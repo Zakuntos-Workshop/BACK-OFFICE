@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import TableDropdown from "components/Dropdowns/TableDropdown.js";
 import API from "api/API";
-import GlobalStyles from "../Style/GlobalTableStyle.css";
+import '../Style/GlobalTableStyle.css'; // Import du style global
 import { Link } from "react-router-dom"; 
 
 export default function RoleTable({ color }) {
@@ -63,61 +63,101 @@ export default function RoleTable({ color }) {
         }
       >
         <div className="rounded-t mb-0 px-4 py-3 border-0">
-          <div className="flex flex-wrap items-center">
-            <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-              <h3
-                className={
-                  "font-semibold text-lg " +
-                  (color === "light" ? "text-blueGray-700" : "text-white")
-                }
+          <div className="flex justify-between items-center">
+            <h3
+              className={
+                "font-semibold text-lg " +
+                (color === "light" ? "text-blueGray-700" : "text-white")
+              }
+            >
+              Les Rôles et Permissions
+            </h3>
+            <div className="flex items-center">
+              <form onSubmit={search} className="mr-4">
+                <input
+                  type="text"
+                  name="keyword"
+                  placeholder="Rechercher..."
+                  className="border rounded px-2 py-1 text-sm"
+                />
+                <select
+                  name="field"
+                  className="ml-2 border rounded px-2 py-1 text-sm"
+                >
+                  <option value="name">Nom</option>
+                  <option value="description">Description</option>
+                </select>
+                <button
+                  type="submit"
+                  className="ml-2 global-button"
+                >
+                  Rechercher
+                </button>
+              </form>
+              <button
+                onClick={cancelSearch}
+                className="global-button bg-gray-500 text-white"
               >
-                Les Rôles et Permissions
-              </h3>
+                Annuler
+              </button>
             </div>
           </div>
         </div>
         <div className="block w-full overflow-x-auto">
-          <table className="items-center w-full bg-transparent border-collapse">
-            <thead>
-              <tr>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Nom
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Description
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Action
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Permissions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {roles.map((role) => (
-                <tr key={role.id}>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left">
-                    {role.name}
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    {role.description}
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    <TableDropdown />
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    <Link
-                      to={`/admin/permissions/${role.id}`} 
-                      className="bg-blue-500 text-white px-3 py-1 rounded"
-                    >
-                      Voir les permissions
-                    </Link>
-                  </td>
+          {isDataLoad ? (
+            <div className="flex justify-center items-center h-48">
+              <div className="loader" />
+            </div>
+          ) : (
+            <table className="global-table">
+              <thead>
+                <tr>
+                  <th className="global-header">Nom</th>
+                  <th className="global-header">Description</th>
+                  <th className="global-header">Action</th>
+                  <th className="global-header">Permissions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {roles.map((role) => (
+                  <tr key={role.id} className="global-row">
+                    <td className="global-cell">{role.name}</td>
+                    <td className="global-cell">{role.description}</td>
+                    <td className="global-cell text-right">
+                      <TableDropdown />
+                    </td>
+                    <td className="global-cell text-right">
+                      <Link
+                        to={`/admin/permissions/${role.id}`} 
+                        className="global-button"
+                      >
+                        Voir les permissions
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+        <div className="flex justify-between items-center p-4">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+            className="global-button"
+          >
+            Précédent
+          </button>
+          <span>
+            Page {page} sur {totalPages}
+          </span>
+          <button
+            disabled={roles.length < perPage}
+            onClick={() => setPage(page + 1)}
+            className="global-button"
+          >
+            Suivant
+          </button>
         </div>
       </div>
     </>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import TableDropdown from "components/Dropdowns/TableDropdown.js";
 import API from "api/API";
+import '../Style/GlobalTableStyle.css'; 
 
 export default function CategoryTable({ color }) {
   const api = new API();
@@ -27,11 +28,11 @@ export default function CategoryTable({ color }) {
     let response;
     if (isSearch) {
       response = await api.getData(
-        `categories?page=${page}&per_page=${per_page}&keyword=${keyword}&field=${field}`
+        `institution_categories?page=${page}&per_page=${per_page}&keyword=${keyword}&field=${field}`
       );
     } else {
       response = await api.getData(
-        `categories?page=${page}&per_page=${per_page}`
+        `institution_categories?page=${page}&per_page=${per_page}`
       );
     }
     setCategories(response.data);
@@ -39,7 +40,7 @@ export default function CategoryTable({ color }) {
   };
 
   const removeCategory = async (category_id) => {
-    await api.send({}, `categories/${category_id}`, "DELETE");
+    await api.send({}, `institution_categories/${category_id}`, "DELETE");
     await getCategories(page, perPage, keyword, field);
     setModalIdDelete(null);
   };
@@ -63,10 +64,8 @@ export default function CategoryTable({ color }) {
 
   useEffect(() => {
     getCategories(page, perPage, keyword, field);
-    loadPermission("/categories");
+    loadPermission("/institution_categories");
   }, [page, perPage, keyword, field]);
-
-console.log(categories)
 
   return (
     <>
@@ -77,78 +76,95 @@ console.log(categories)
         }
       >
         <div className="rounded-t mb-0 px-4 py-3 border-0">
-          <div className="flex flex-wrap items-center">
-            <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-              <h3
-                className={
-                  "font-semibold text-lg " +
-                  (color === "light" ? "text-blueGray-700" : "text-white")
-                }
+          <div className="flex justify-between items-center">
+            <h3
+              className={
+                "font-semibold text-lg " +
+                (color === "light" ? "text-blueGray-700" : "text-white")
+              }
+            >
+              Catégories
+            </h3>
+            <div className="flex items-center">
+              <form onSubmit={search} className="mr-4">
+                <input
+                  type="text"
+                  name="keyword"
+                  placeholder="Rechercher..."
+                  className="border rounded px-2 py-1 text-sm"
+                />
+                <select
+                  name="field"
+                  className="ml-2 border rounded px-2 py-1 text-sm"
+                >
+                  <option value="name">Nom</option>
+                  <option value="description">Description</option>
+                </select>
+                <button
+                  type="submit"
+                  className="ml-2 global-button"
+                >
+                  Rechercher
+                </button>
+              </form>
+              <button
+                onClick={cancelSearch}
+                className="global-button bg-gray-500 text-white"
               >
-                Les Categories
-              </h3>
+                Annuler
+              </button>
             </div>
           </div>
         </div>
         <div className="block w-full overflow-x-auto">
-          <table className="items-center w-full bg-transparent border-collapse">
-            <thead>
-              <tr>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Logo
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Nom
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Catégorie
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Description
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Adresse
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Statut
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            {/* <tbody>
-              {categories?.map((category, index) => (
-                <tr key={index}>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                    <img
-                      src={category.logo}
-                      className="h-12 w-12 bg-white rounded-full border"
-                      alt={category.name}
-                    />
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    {category.name}
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    {category.category}
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    {category.description}
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    {category.address}
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    {category.status}
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-right">
-                    <TableDropdown />
-                  </td>
+          {isDataLoad ? (
+            <div className="flex justify-center items-center h-48">
+              <div className="loader" />
+            </div>
+          ) : (
+            <table className="global-table">
+              <thead>
+                <tr>
+                  <th className="global-header">Nom</th>
+                  <th className="global-header">Description</th>
+                  <th className="global-header">Date de création</th>
+                  <th className="global-header">Action</th>
                 </tr>
-              ))}
-            </tbody> */}
-          </table>
+              </thead>
+              <tbody>
+                {categories?.map((category, index) => (
+                  <tr key={index} className="global-row">
+                    <td className="global-cell">{category.name}</td>
+                    <td className="global-cell">{category.description}</td>
+                    <td className="global-cell">{category.created_at}</td>
+                    <td className="global-cell text-right">
+                      <button className="global-button">Modifier</button>
+                      <button className="global-button ml-2" onClick={() => setModalIdDelete(category.id)}>Supprimer</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+        <div className="flex justify-between items-center p-4">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+            className="global-button"
+          >
+            Précédent
+          </button>
+          <span>
+            Page {page}
+          </span>
+          <button
+            disabled={categories.length < perPage}
+            onClick={() => setPage(page + 1)}
+            className="global-button"
+          >
+            Suivant
+          </button>
         </div>
       </div>
     </>

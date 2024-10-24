@@ -1,73 +1,29 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
-import TableDropdown from "components/Dropdowns/TableDropdown.js";
 import API from "api/API";
+import '../Style/GlobalTableStyle.css';  
+import TableDropdown from "components/Dropdowns/TableDropdown.js";
+import moment from "moment";
 
 export default function CityTable({ color }) {
   const api = new API();
 
   const [cities, setCities] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
-  const [modalIdOpen, setModalIdOpen] = useState(null);
-  const [modalIdDelete, setModalIdDelete] = useState(null);
-  const [field, setField] = useState(undefined);
-  const [keyword, setKeyword] = useState(undefined);
-  const [isSearch, setIsSearch] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDataLoad, setIsDataLoad] = useState(false);
-  const [permission, setPermission] = useState(null);
 
-  const loadPermission = async (url) => {
-    const perm = await api.permission(url);
-    setPermission(perm);
-  };
-
-  const getCities = async (page, per_page, keyword, field) => {
+  const getCities = async (page, per_page) => {
     setIsDataLoad(true);
-    let response;
-    if (isSearch) {
-      response = await api.getData(
-        `cities?page=${page}&per_page=${per_page}&keyword=${keyword}&field=${field}`
-      );
-    } else {
-      response = await api.getData(
-        `cities?page=${page}&per_page=${per_page}`
-      );
-    }
+    const response = await api.getData(`cities?page=${page}&per_page=${per_page}`);
     setCities(response.data);
+    setTotalPages(Math.ceil(response.total / perPage)); 
     setIsDataLoad(false);
   };
 
-  const removeCity = async (city_id) => {
-    await api.send({}, `cities/${city_id}`, "DELETE");
-    await getCities(page, perPage, keyword, field);
-    setModalIdDelete(null);
-  };
-
-  const cancelSearch = () => {
-    setIsSearch(false);
-    setKeyword(null);
-    setField(null);
-    getCities(page, perPage, null, null);
-  };
-
-  const search = async (e) => {
-    e.preventDefault();
-    const newKeyword = e.target["keyword"].value;
-    const newField = e.target["field"].value;
-    setKeyword(newKeyword);
-    setField(newField);
-    setIsSearch(true);
-    await getCities(page, perPage, newKeyword, newField);
-  };
-
   useEffect(() => {
-    getCities(page, perPage, keyword, field);
-    loadPermission("/cities");
-  }, [page, perPage, keyword, field]);
-
-console.log(cities)
+    getCities(page, perPage);
+  }, [page, perPage]);
 
   return (
     <>
@@ -78,84 +34,69 @@ console.log(cities)
         }
       >
         <div className="rounded-t mb-0 px-4 py-3 border-0">
-          <div className="flex flex-wrap items-center">
-            <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-              <h3
-                className={
-                  "font-semibold text-lg " +
-                  (color === "light" ? "text-blueGray-700" : "text-white")
-                }
-              >
-                Les Villes
-              </h3>
-            </div>
+          <div className="flex justify-between items-center">
+            <h3
+              className={
+                "font-semibold text-lg " +
+                (color === "light" ? "text-blueGray-700" : "text-white")
+              }
+            >
+              Les Villes
+            </h3>
           </div>
         </div>
         <div className="block w-full overflow-x-auto">
-          <table className="items-center w-full bg-transparent border-collapse">
-            <thead>
-              <tr>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Logo
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Nom
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Catégorie
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Description
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Adresse
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Statut
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            {/* <tbody>
-              {cities?.map((city, index) => (
-                <tr key={index}>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                    <img
-                      src={city.logo}
-                      className="h-12 w-12 bg-white rounded-full border"
-                      alt={city.name}
-                    />
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    {city.name}
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    {city.category}
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    {city.description}
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    {city.address}
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    {city.status}
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-right">
-                    <TableDropdown />
-                  </td>
+          {isDataLoad ? (
+            <div className="flex justify-center items-center h-48">
+              <div className="loader" />
+            </div>
+          ) : (
+            <table className="global-table">
+              <thead>
+                <tr>
+                  <th className="global-header">Nom</th>
+                  <th className="global-header">Province</th>
+                  <th className="global-header">Date de création</th>
+                  <th className="global-header">Action</th>
                 </tr>
-              ))}
-            </tbody> */}
-          </table>
+              </thead>
+              <tbody>
+                {cities.map((city, index) => (
+                  <tr key={index} className="global-row">
+                    <td className="global-cell">{city.name}</td>
+                    <td className="global-cell">{city.province}</td>
+                    <td className="global-cell">
+                      {city.created_at}
+                    </td>
+                    <td className="global-cell text-right">
+                      <TableDropdown />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+        <div className="flex justify-between items-center p-4">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+            className="global-button"
+          >
+            Précédent
+          </button>
+          <span>
+            Page {page} sur {totalPages}
+          </span>
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
+            className="global-button"
+          >
+            Suivant
+          </button>
         </div>
       </div>
     </>
   );
 }
-
-CityTable.propTypes = {
-  color: PropTypes.string,
-};

@@ -96,7 +96,6 @@ export default function StudentTable({ color }) {
           <table className="global-table">
             <thead>
               <tr>
-                <th className="global-header"></th>
                 <th className="global-header">Nom</th>
                 <th className="global-header">Client</th>
                 <th className="global-header">Genre</th>
@@ -107,11 +106,6 @@ export default function StudentTable({ color }) {
             <tbody>
               {students.map((student) => (
                 <tr key={student.id} className="global-row">
-                  <td className="global-cell"><img
-                        src={student.logo}
-                        alt={student.name}
-                        className="h-12 w-12 rounded-full border"
-                      /></td>
                   <td className="global-cell">{student.full_name}</td>
                   <td className="global-cell">{student.user.full_name}</td>
                   <td className="global-cell">{student.gender}</td>

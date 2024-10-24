@@ -4,6 +4,7 @@ import Sidebar from "components/Sidebar/Sidebar.js";
 import HeaderStats from "components/Headers/HeaderStats.js";
 import FooterAdmin from "components/Footers/FooterAdmin.js";
 import Dashboard from "views/components/Dashboard.js";
+import BankAccountsView from "views/components/BankAccountsView";
 
 export default function BankAccounts() {
   return (
@@ -13,7 +14,7 @@ export default function BankAccounts() {
         <AdminNavbar />
         <HeaderStats />
         <div className="px-4 md:px-10 mx-auto w-full -m-24">
-          <Dashboard />
+          <BankAccountsView />
           <FooterAdmin />
         </div>
       </div>

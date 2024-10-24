@@ -27,6 +27,7 @@ import Features from "layouts/Features";
 import BankAccounts from "layouts/BankAccounts";
 import Currencies from "layouts/Currencies";
 import Permissions from "layouts/Permissions";
+import Categories from "layouts/Categories";
 
 const queryClient = new QueryClient(); 
 const root = createRoot(document.getElementById("root"));
@@ -40,6 +41,7 @@ root.render(
           <Route path="/admin/users" element={<Users />} />
           <Route path="/admin/user/:id" element={<Users />} />
           <Route path="/admin/institutions" element={<Institutions />} /> 
+          <Route path="/admin/categories" element={<Categories/>} /> 
           <Route path="/admin/institution/:id" element={<Institutions />} /> 
           <Route path="/admin/reports" element={<Reports />} />
           <Route path="/admin/students" element={<Students />} />

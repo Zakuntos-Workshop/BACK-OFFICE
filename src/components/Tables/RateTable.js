@@ -2,26 +2,20 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import TableDropdown from "components/Dropdowns/TableDropdown.js";
 import API from "api/API";
+import moment from "moment";
+import '../Style/GlobalTableStyle.css';  // Ajout du fichier de style
 
 export default function RateTable({ color }) {
   const api = new API();
 
   const [rates, setRates] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
-  const [modalIdOpen, setModalIdOpen] = useState(null);
-  const [modalIdDelete, setModalIdDelete] = useState(null);
-  const [field, setField] = useState(undefined);
-  const [keyword, setKeyword] = useState(undefined);
-  const [isSearch, setIsSearch] = useState(false);
   const [isDataLoad, setIsDataLoad] = useState(false);
-  const [permission, setPermission] = useState(null);
-
-  const loadPermission = async (url) => {
-    const perm = await api.permission(url);
-    setPermission(perm);
-  };
+  const [keyword, setKeyword] = useState(undefined);
+  const [field, setField] = useState(undefined);
+  const [isSearch, setIsSearch] = useState(false);
+  const [modalIdDelete, setModalIdDelete] = useState(null);
 
   const getRates = async (page, per_page, keyword, field) => {
     setIsDataLoad(true);
@@ -31,9 +25,7 @@ export default function RateTable({ color }) {
         `rates?page=${page}&per_page=${per_page}&keyword=${keyword}&field=${field}`
       );
     } else {
-      response = await api.getData(
-        `rates?page=${page}&per_page=${per_page}`
-      );
+      response = await api.getData(`rates?page=${page}&per_page=${per_page}`);
     }
     setRates(response.data);
     setIsDataLoad(false);
@@ -64,10 +56,7 @@ export default function RateTable({ color }) {
 
   useEffect(() => {
     getRates(page, perPage, keyword, field);
-    loadPermission("/rates");
   }, [page, perPage, keyword, field]);
-
-console.log(rates)
 
   return (
     <>
@@ -78,47 +67,83 @@ console.log(rates)
         }
       >
         <div className="rounded-t mb-0 px-4 py-3 border-0">
-          <div className="flex flex-wrap items-center">
-            <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-              <h3
-                className={
-                  "font-semibold text-lg " +
-                  (color === "light" ? "text-blueGray-700" : "text-white")
-                }
+          <div className="flex justify-between items-center">
+            <h3
+              className={
+                "font-semibold text-lg " +
+                (color === "light" ? "text-blueGray-700" : "text-white")
+              }
+            >
+              Le Taux
+            </h3>
+            <div className="flex items-center">
+              <form onSubmit={search} className="mr-4">
+                <input
+                  type="text"
+                  name="keyword"
+                  placeholder="Rechercher..."
+                  className="border rounded px-2 py-1 text-sm"
+                />
+                <select
+                  name="field"
+                  className="ml-2 border rounded px-2 py-1 text-sm"
+                >
+                  <option value="from_currency">Devise de depart</option>
+                  <option value="to_currency">Devise de conversion</option>
+                </select>
+                <button
+                  type="submit"
+                  className="ml-2 bg-blue-500 text-white px-4 py-1 rounded"
+                >
+                  Rechercher
+                </button>
+              </form>
+              <button
+                onClick={cancelSearch}
+                className="bg-gray-500 text-white px-4 py-1 rounded"
               >
-                Le Taux
-              </h3>
+                Annuler
+              </button>
             </div>
           </div>
         </div>
         <div className="block w-full overflow-x-auto">
-          <table className="items-center w-full bg-transparent border-collapse">
-            <thead>
-              <tr>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Taux
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            {/* <tbody>
-              {rates?.map((rate, index) => (
-                <tr key={index}>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    {rate.rate}
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    Action
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-right">
-                    <TableDropdown />
-                  </td>
+          {isDataLoad ? (
+            <div className="flex justify-center items-center h-48">
+              <div className="loader" />
+            </div>
+          ) : (
+            <table className="global-table">
+              <thead>
+                <tr>
+                  <th className="global-header">Devise de départ</th>
+                  <th className="global-header">Devise de conversion</th>
+                  <th className="global-header">Taux de conversion</th>
+                  <th className="global-header">Taux par défaut</th>
+                  <th className="global-header">Date de création</th>
+                  <th className="global-header">Action</th>
                 </tr>
-              ))}
-            </tbody> */}
-          </table>
+              </thead>
+              <tbody>
+                {rates?.map((rate, index) => (
+                  <tr key={index} className="global-row">
+                    <td className="global-cell">{rate.currency.name}</td>
+                    <td className="global-cell">{rate.currencyTo.name}</td>
+                    <td className="global-cell">{rate.amount}</td>
+                    <td className="global-cell">
+                      {rate.is_default ? "Oui" : "Non"}
+                    </td>
+                    <td className="global-cell">
+                      {rate.created_at}
+                    </td>
+                    <td className="global-cell text-right">
+                      <TableDropdown />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </>

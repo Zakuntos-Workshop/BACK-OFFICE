@@ -137,8 +137,8 @@ export default function PermissionTable({ color }) {
                     <label key={perm} className="flex items-center mr-4">
                       <input
                         type="checkbox"
-                        checked={feature.permission[perm]} // Vérifie directement la permission
-                        onChange={(e) => handleCheckboxChange(feature.id, perm, e.target.checked)} // Envoie vrai ou faux
+                        checked={feature.permission[perm]}
+                        onChange={(e) => handleCheckboxChange(feature.id, perm, e.target.checked)} 
                       />
                       <span className="ml-2">{perm.replace('has', '')}</span>
                     </label>

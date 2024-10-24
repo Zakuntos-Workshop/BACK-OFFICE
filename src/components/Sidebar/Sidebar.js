@@ -127,30 +127,6 @@ export default function Sidebar() {
                   Transactions
                 </Link>
               </li>
-
-              
-
-              <li className="items-center">
-                <Link
-                  className={
-                    "text-xs uppercase py-3 font-bold block " +
-                    (window.location.href.indexOf("/admin/reports") !== -1
-                      ? "text-lightBlue-500 hover:text-lightBlue-600"
-                      : "text-blueGray-700 hover:text-blueGray-500")
-                  }
-                  to="/admin/reports"
-                >
-                  <i
-                    className={
-                      "fas fa-map-marked mr-2 text-sm " +
-                      (window.location.href.indexOf("/admin/reports") !== -1
-                        ? "opacity-75"
-                        : "text-blueGray-300")
-                    }
-                  ></i>{" "}
-                  Rapports
-                </Link>
-              </li>
             </ul>
 
             <hr className="my-4 md:min-w-full" />
@@ -218,6 +194,15 @@ export default function Sidebar() {
                 >
                   <i className="fas fa-money-check text-blueGray-400 mr-2 text-sm"></i>{" "}
                   Frais de Transactions
+                </Link>
+              </li>
+              <li className="items-center">
+                <Link
+                  className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
+                  to="/admin/categories"
+                >
+                  <i className="fas fa-folder text-blueGray-400 mr-2 text-sm"></i>{" "}
+                  Categorie d'institution
                 </Link>
               </li>
               <li className="items-center">

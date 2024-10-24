@@ -1,49 +1,33 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
-import TableDropdown from "components/Dropdowns/TableDropdown.js";
 import API from "api/API";
+import '../Style/GlobalTableStyle.css';  
+import moment from "moment";
 
 export default function FeesTable({ color }) {
   const api = new API();
 
-  const [  , setFees] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [fees, setFees] = useState([]);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
-  const [modalIdOpen, setModalIdOpen] = useState(null);
-  const [modalIdDelete, setModalIdDelete] = useState(null);
-  const [field, setField] = useState(undefined);
-  const [keyword, setKeyword] = useState(undefined);
-  const [isSearch, setIsSearch] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDataLoad, setIsDataLoad] = useState(false);
-  const [permission, setPermission] = useState(null);
-
-  const loadPermission = async (url) => {
-    const perm = await api.permission(url);
-    setPermission(perm);
-  };
+  const [keyword, setKeyword] = useState(undefined);
+  const [field, setField] = useState(undefined);
+  const [isSearch, setIsSearch] = useState(false);
 
   const getFees = async (page, per_page, keyword, field) => {
     setIsDataLoad(true);
     let response;
     if (isSearch) {
-      response = await api.getData(
-        `fees?page=${page}&per_page=${per_page}&keyword=${keyword}&field=${field}`
-      );
+      response = await api.getData(`transaction_fees?page=${page}&per_page=${per_page}&keyword=${keyword}&field=${field}`);
     } else {
-      response = await api.getData(
-        `fees?page=${page}&per_page=${per_page}`
-      );
+      response = await api.getData(`transaction_fees?page=${page}&per_page=${per_page}`);
     }
     setFees(response.data);
+    setTotalPages(Math.ceil(response.total / perPage));
     setIsDataLoad(false);
   };
-
-  const removeFees = async (fees_id) => {
-    await api.send({}, `fees/${fees_id}`, "DELETE");
-    await getFees(page, perPage, keyword, field);
-    setModalIdDelete(null);
-  };
+  console.log(fees)
 
   const cancelSearch = () => {
     setIsSearch(false);
@@ -64,9 +48,7 @@ export default function FeesTable({ color }) {
 
   useEffect(() => {
     getFees(page, perPage, keyword, field);
-    loadPermission("/fees");
   }, [page, perPage, keyword, field]);
-
 
   return (
     <>
@@ -77,44 +59,99 @@ export default function FeesTable({ color }) {
         }
       >
         <div className="rounded-t mb-0 px-4 py-3 border-0">
-          <div className="flex flex-wrap items-center">
-            <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-              <h3
-                className={
-                  "font-semibold text-lg " +
-                  (color === "light" ? "text-blueGray-700" : "text-white")
-                }
+          <div className="flex justify-between items-center">
+            <h3
+              className={
+                "font-semibold text-lg " +
+                (color === "light" ? "text-blueGray-700" : "text-white")
+              }
+            >
+              Les Frais
+            </h3>
+            <div className="flex items-center">
+              <form onSubmit={search} className="mr-4">
+                <input
+                  type="text"
+                  name="keyword"
+                  placeholder="Rechercher..."
+                  className="border rounded px-2 py-1 text-sm"
+                />
+                <select
+                  name="field"
+                  className="ml-2 border rounded px-2 py-1 text-sm"
+                >
+                  <option value="name">Nom</option>
+                  <option value="amount">Montant</option>
+                </select>
+                <button
+                  type="submit"
+                  className="ml-2 bg-blue-500 text-white px-4 py-1 rounded"
+                >
+                  Rechercher
+                </button>
+              </form>
+              <button
+                onClick={cancelSearch}
+                className="bg-gray-500 text-white px-4 py-1 rounded"
               >
-                Les Frais
-              </h3>
+                Annuler
+              </button>
             </div>
           </div>
         </div>
         <div className="block w-full overflow-x-auto">
-          <table className="items-center w-full bg-transparent border-collapse">
-            <thead>
-              <tr>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Mode de paiement
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Pourcentage
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Date de creation
-                </th>
-                <th className="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                  Action
-                </th>
-              </tr>
-            </thead>
-          </table>
+          {isDataLoad ? (
+            <div className="flex justify-center items-center h-48">
+              <div className="loader" />
+            </div>
+          ) : (
+            <table className="global-table">
+              <thead>
+                <tr>
+                  <th className="global-header">Nom</th>
+                  <th className="global-header">Pourcentage</th>
+                  <th className="global-header">Date de création</th>
+                  <th className="global-header">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {fees?.map((fee, index) => (
+                  <tr key={index} className="global-row">
+                    <td className="global-cell">{fee.payMode.name}</td>
+                    <td className="global-cell">{fee.percentage}</td>
+                    <td className="global-cell">
+                    {moment(fee.created_at).format("DD MMMM YYYY")} 
+                  </td>
+                    <td className="global-cell text-right">
+                      <button className="global-button">Modifier</button>
+                      <button className="global-button ml-2">Supprimer</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+        <div className="flex justify-between items-center p-4">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+            className="global-button"
+          >
+            Précédent
+          </button>
+          <span>
+            Page {page} sur {totalPages}
+          </span>
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
+            className="global-button"
+          >
+            Suivant
+          </button>
         </div>
       </div>
     </>
   );
 }
-
-FeesTable.propTypes = {
-  color: PropTypes.string,
-};
